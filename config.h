@@ -6,11 +6,7 @@
 /* appearance */
 static const int sloppyfocus               = 1;  /* focus follows mouse */
 static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
-static const unsigned int borderpx         = 0;  /* border pixel of windows, remove? */
 static const float rootcolor[]             = COLOR(0xffffffff);
-static const float bordercolor[]           = COLOR(0x444444ff);
-static const float focuscolor[]            = COLOR(0x005577ff);
-static const float urgentcolor[]           = COLOR(0xff0000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 1.0f}; /* You can also use glsl colors */
 
@@ -122,8 +118,8 @@ static const char *menucmd[] = { "bemenu-run", NULL };
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  key                 function          argument */
-	{ MODKEY                   , XKB_KEY_d,          spawn,            {.v = menucmd} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,     spawn,            {.v = termcmd} },
+	{ MODKEY,                    XKB_KEY_d,          spawn,            {.v = menucmd} },
+	{ MODKEY,                    XKB_KEY_Return,     spawn,            {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_e,          focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_i,          focusstack,       {.i = -1} },
 	//{ MODKEY,                    XKB_KEY_i,          incnmaster,       {.i = +1} },

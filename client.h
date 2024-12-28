@@ -138,8 +138,8 @@ client_get_clip(Client *c, struct wlr_box *clip)
 	*clip = (struct wlr_box){
 		.x = 0,
 		.y = 0,
-		.width = c->geom.width - c->bw,
-		.height = c->geom.height - c->bw,
+		.width = c->geom.width,
+		.height = c->geom.height,
 	};
 
 #ifdef XWAYLAND
@@ -325,14 +325,6 @@ client_send_close(Client *c)
 }
 
 static inline void
-client_set_border_color(Client *c, const float color[static 4])
-{
-	int i;
-	for (i = 0; i < 4; i++)
-		wlr_scene_rect_set_color(c->border[i], color);
-}
-
-static inline void
 client_set_fullscreen(Client *c, int fullscreen)
 {
 #ifdef XWAYLAND
@@ -350,7 +342,7 @@ client_set_size(Client *c, uint32_t width, uint32_t height)
 #ifdef XWAYLAND
 	if (client_is_x11(c)) {
 		wlr_xwayland_surface_configure(c->surface.xwayland,
-				c->geom.x + c->bw, c->geom.y + c->bw, width, height);
+				c->geom.x, c->geom.y, width, height);
 		return 0;
 	}
 #endif
