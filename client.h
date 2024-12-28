@@ -325,6 +325,12 @@ client_send_close(Client *c)
 }
 
 static inline void
+client_set_dimmer_state(Client *c, const int dim)
+{
+  wlr_scene_node_set_enabled(&c->dimmer->node, DIMOPT && !c->neverdim && dim);
+}
+
+static inline void
 client_set_fullscreen(Client *c, int fullscreen)
 {
 #ifdef XWAYLAND

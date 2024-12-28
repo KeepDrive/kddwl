@@ -110,6 +110,7 @@ typedef struct {
 	struct wlr_box geom; /* layout-relative */
 	Monitor *mon;
 	struct wlr_scene_tree *scene;
+  struct wlr_scene_rect *dimmer;
 	struct wlr_scene_tree *scene_surface;
 	struct wl_list link;
 	struct wl_list flink;
@@ -137,7 +138,7 @@ typedef struct {
 	struct wl_listener set_hints;
 #endif
 	uint32_t tags;
-	int isfloating, isurgent, isfullscreen;
+	int isfloating, isurgent, isfullscreen, neverdim;
 	uint32_t resize; /* configure serial of a pending resize */
 } Client;
 
@@ -228,6 +229,7 @@ typedef struct {
 	const char *title;
 	uint32_t tags;
 	int isfloating;
+  int neverdim;
 	int monitor;
 } Rule;
 
@@ -336,6 +338,8 @@ static void startdrag(struct wl_listener *listener, void *data);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
+static void toggledimming(const Arg *arg);
+static void toggledimmingclient(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
 static void toggletag(const Arg *arg);
@@ -410,6 +414,7 @@ static struct wlr_output_layout *output_layout;
 static struct wlr_box sgeom;
 static struct wl_list mons;
 static Monitor *selmon;
+static int DIMOPT = 1;
 
 #ifdef XWAYLAND
 static void activatex11(struct wl_listener *listener, void *data);
@@ -468,6 +473,7 @@ applyrules(Client *c)
 		if ((!r->title || strstr(title, r->title))
 				&& (!r->id || strstr(appid, r->id))) {
 			c->isfloating = r->isfloating;
+      c->neverdim = r->neverdim;
 			newtags |= r->tags;
 			i = 0;
 			wl_list_for_each(m, &mons, link) {
@@ -1368,6 +1374,9 @@ focusclient(Client *c, int lift)
 		client_restack_surface(c);
   }
 
+  if (!exclusive_focus && !seat->drag)
+    client_set_dimmer_state(c, 0);
+
 	/* Deactivate old client if focus is changing */
 	if (old && (!c || client_surface(c) != old)) {
     /* TODO: Not quite sure how or if I should change any of this */
@@ -1384,6 +1393,7 @@ focusclient(Client *c, int lift)
 		/* Don't deactivate old client if the new one wants focus, as this causes issues with winecfg
 		 * and probably other clients */
 		} else if (old_c && !client_is_unmanaged(old_c) && (!c || !client_wants_focus(c))) {
+      client_set_dimmer_state(old_c, 1);
 			client_activate_surface(old, 0);
 		}
 	}
@@ -1681,7 +1691,7 @@ mapnotify(struct wl_listener *listener, void *data)
 {
 	/* Called when the surface is mapped, or ready to display on-screen. */
 	Client *p = NULL;
-	Client *w, *c = wl_container_of(listener, c, map);
+  Client *w, *d, *c = wl_container_of(listener, c, map);
 	Monitor *m;
 	int i;
 
@@ -1707,6 +1717,10 @@ mapnotify(struct wl_listener *listener, void *data)
 		goto unset_fullscreen;
 	}
 
+  c->dimmer = wlr_scene_rect_create(c->scene, 0, 0, unfocuseddim);
+  c->dimmer->node.data = c;
+  client_set_dimmer_state(c, 1);
+
 	/* Initialize client geometry */
 	client_set_tiled(c, WLR_EDGE_TOP | WLR_EDGE_BOTTOM | WLR_EDGE_LEFT | WLR_EDGE_RIGHT);
 
@@ -1723,6 +1737,9 @@ mapnotify(struct wl_listener *listener, void *data)
 		setmon(c, p->mon, p->tags);
 	} else {
 		applyrules(c);
+    d = focustop(selmon);
+    if (d)
+      client_set_dimmer_state(d, 0);
 	}
 	printstatus();
 
@@ -2178,9 +2195,11 @@ resize(Client *c, struct wlr_box geo, int interact)
 	c->geom = geo;
 	applybounds(c, bbox);
 
-	/* Update scene-graph */
+	/* Update scene-graph, including dimmer */
 	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
 	wlr_scene_node_set_position(&c->scene_surface->node, 0, 0);
+  wlr_scene_rect_set_size(c->dimmer, c->geom.width, c->geom.height);
+  wlr_scene_node_set_position(&c->dimmer->node, 0, 0);
 
 	/* this is a no-op if size hasn't changed */
 	c->resize = client_set_size(c, c->geom.width,
@@ -2698,6 +2717,28 @@ tile(Monitor *m)
 		}
 		i++;
 	}
+}
+
+void
+toggledimming(const Arg *arg)
+{
+  Client *c;
+  DIMOPT ^= 1;
+  wl_list_for_each(c, &clients, link)
+  {
+    client_set_dimmer_state(c, 1);
+  }
+  c = focustop(selmon);
+  if (c)
+    client_set_dimmer_state(c, 0);
+}
+
+void
+toggledimmingclient(const Arg *arg)
+{
+  Client *sel = focustop(selmon);
+  if (sel)
+    sel->neverdim ^= 1;
 }
 
 void
