@@ -21,7 +21,7 @@ static int log_level = WLR_ERROR;
 static const Rule rules[] = {
 	/* app_id             title       tags mask     isfloating  neverdim  monitor */
 	/* examples: */
-	{ "Gimp_EXAMPLE",     NULL,       0,            1,          0,        -1 }, /* Start on currently visible tags floating, not tiled */
+	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,          1,        -1 },
 };
 
 /* layout(s) */
@@ -167,6 +167,6 @@ static const Key keys[] = {
 static const Button buttons[] = {
 	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
 	{ MODKEY, BTN_MIDDLE, togglefloating, {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, BTN_MIDDLE, toggledimmingclient, {0} },
+	//{ MODKEY|WLR_MODIFIER_SHIFT, BTN_MIDDLE, toggledimmingclient, {0} },
 	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize} },
 };

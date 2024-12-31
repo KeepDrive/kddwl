@@ -1372,10 +1372,10 @@ focusclient(Client *c, int lift)
 		selmon = c->mon;
 		c->isurgent = 0;
 		client_restack_surface(c);
-  }
 
-  if (!exclusive_focus && !seat->drag)
-    client_set_dimmer_state(c, 0);
+    if (!exclusive_focus && !seat->drag)
+      client_set_dimmer_state(c, 0);
+  }
 
 	/* Deactivate old client if focus is changing */
 	if (old && (!c || client_surface(c) != old)) {
@@ -1690,8 +1690,8 @@ void
 mapnotify(struct wl_listener *listener, void *data)
 {
 	/* Called when the surface is mapped, or ready to display on-screen. */
-	Client *p = NULL;
-  Client *w, *d, *c = wl_container_of(listener, c, map);
+	Client *p, *d = NULL;
+  Client *w, *c = wl_container_of(listener, c, map);
 	Monitor *m;
 	int i;
 
