@@ -114,6 +114,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 
 /* commands */
 static const char *termcmd[] = { "alacritty", NULL };
+static const char *screenshotcmd[] = { "grimshot", "copy", "area", NULL };
 static const char *menucmd[] = { "bemenu-run", NULL };
 
 static const Key keys[] = {
@@ -121,6 +122,7 @@ static const Key keys[] = {
 	/* modifier                  key                 function          argument */
 	{ MODKEY,                    XKB_KEY_d,          spawn,            {.v = menucmd} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,            {.v = termcmd} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_S,          spawn,            {.v = screenshotcmd} },
 	{ MODKEY,                    XKB_KEY_e,          focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_i,          focusstack,       {.i = -1} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_I,          incnmaster,       {.i = +1} },
