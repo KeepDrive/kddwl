@@ -137,7 +137,7 @@ static const Key keys[] = {
 	//{ MODKEY,                    XKB_KEY_m,          setlayout,        {.v = &layouts[2]} },
 	{ MODKEY,                    XKB_KEY_u,          setlayout,        {0} },
 	{ MODKEY,                    XKB_KEY_apostrophe, toggledimmingclient,{0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_quote,      toggledimming,    {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_quotedbl,   toggledimming,    {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_U,          togglefloating,   {0} },
 	{ MODKEY,                    XKB_KEY_f,          togglefullscreen, {0} },
 	{ MODKEY,                    XKB_KEY_0,          view,             {.ui = ~0} },
@@ -170,6 +170,6 @@ static const Key keys[] = {
 static const Button buttons[] = {
 	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
 	{ MODKEY, BTN_MIDDLE, togglefloating, {0} },
-	//{ MODKEY|WLR_MODIFIER_SHIFT, BTN_MIDDLE, toggledimmingclient, {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, BTN_MIDDLE, toggledimmingclient, {0} },
 	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize} },
 };
